@@ -37,7 +37,7 @@ const COVERAGE_LABELS = {
 let articles = [];
 let narratives = [];
 let campaigns = [];
-let filters = { entity: "", tier: "", coverage: "", tone: "" };
+let filters = { entity: "К-2", tier: "", coverage: "", tone: "" };
 let metric = "count"; // "count" or "mqs"
 let charts = {}; // chart.js instances by canvas id
 
@@ -115,17 +115,19 @@ function k2Articles() {
 }
 
 function initFilters() {
+  // Sync dropdowns with initial filter state (К-2 default)
   ["Entity", "Tier", "Coverage", "Tone"].forEach((k) => {
     const el = document.getElementById("filter" + k);
+    el.value = filters[k.toLowerCase()];
     el.addEventListener("change", () => {
       filters[k.toLowerCase()] = el.value;
       renderAll();
     });
   });
   document.getElementById("filterReset").addEventListener("click", () => {
-    filters = { entity: "", tier: "", coverage: "", tone: "" };
+    filters = { entity: "К-2", tier: "", coverage: "", tone: "" };
     ["Entity", "Tier", "Coverage", "Tone"].forEach((k) => {
-      document.getElementById("filter" + k).value = "";
+      document.getElementById("filter" + k).value = filters[k.toLowerCase()];
     });
     renderAll();
   });
