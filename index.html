@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8" />
+<title>К-2 Media Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Інтерактивна візуалізація медіа-присутності бригади К-2 у порівнянні з «Птахи Мадяра» та «Азов». 573 статті, 27 кампаній, 7 наративів." />
+<meta property="og:title" content="К-2 Media Dashboard" />
+<meta property="og:description" content="Аналітика медіа-покриття 20-ї окремої бригади безпілотних систем «К-2». Травень 2025 — травень 2026." />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          primary: '#6D5BFF',
+          'primary-2': '#5B47F4',
+          'primary-3': '#9A8CFF',
+          lime: '#C8FF61',
+          bg: '#F7F6FF',
+          ink: '#0F1015',
+          surface: '#FFFFFF',
+          'surface-muted': '#F3F2F8',
+          text: '#1F2430',
+          muted: '#5B6072',
+          border: '#E6E7EF',
+          success: '#22C55E',
+          warning: '#F59E0B',
+          danger: '#EF4444',
+        },
+        borderRadius: {
+          sm: '12px', md: '16px', lg: '20px', xl: '24px', '2xl': '28px',
+        },
+        boxShadow: {
+          card: '0 12px 30px rgba(20, 16, 40, 0.1)',
+          soft: '0 6px 16px rgba(20, 16, 40, 0.08)',
+        },
+        fontFamily: {
+          sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        },
+      },
+    },
+  };
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="styles.css" rel="stylesheet" />
+</head>
+<body class="bg-bg text-text font-sans antialiased min-h-screen">
+
+<!-- Header -->
+<header class="bg-surface border-b border-border">
+  <div class="max-w-[1400px] mx-auto px-6 py-5 flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-ink">К-2 Media Dashboard</h1>
+      <p class="text-sm text-muted mt-1">Аналітика медіа-присутності 20-ї окремої бригади безпілотних систем • Травень 2025 — травень 2026</p>
+    </div>
+    <div class="text-right">
+      <div class="text-xs text-muted">Датасет</div>
+      <div class="text-sm font-medium" id="datasetStamp">—</div>
+    </div>
+  </div>
+</header>
+
+<!-- Filters bar -->
+<div class="bg-surface border-b border-border sticky top-0 z-30 shadow-soft">
+  <div class="max-w-[1400px] mx-auto px-6 py-3 flex flex-wrap gap-3 items-center">
+    <span class="text-xs text-muted uppercase font-semibold tracking-wider">Фільтри:</span>
+
+    <div class="filter-group">
+      <label>Бригада</label>
+      <select id="filterEntity" class="filter-select">
+        <option value="">Усі</option>
+        <option value="К-2">К-2</option>
+        <option value="Птахи Мадяра">Птахи Мадяра</option>
+        <option value="Азов">Азов</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Tier медіа</label>
+      <select id="filterTier" class="filter-select">
+        <option value="">Усі</option>
+        <option value="Tier 1">Tier 1 (топ)</option>
+        <option value="Tier 2">Tier 2</option>
+        <option value="Tier 3">Tier 3</option>
+        <option value="Tier 4">Tier 4</option>
+        <option value="Tier 5">Tier 5 (нішеві)</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Тип матеріалу</label>
+      <select id="filterCoverage" class="filter-select">
+        <option value="">Усі</option>
+        <option value="News">News</option>
+        <option value="Mention">Mention</option>
+        <option value="Comment/quote">Comment/quote</option>
+        <option value="Interview">Interview</option>
+        <option value="Feature story">Feature story</option>
+        <option value="List">List</option>
+        <option value="Guest post">Guest post</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Тональність</label>
+      <select id="filterTone" class="filter-select">
+        <option value="">Усі</option>
+        <option value="Positive">Позитивна</option>
+        <option value="Neutral">Нейтральна</option>
+        <option value="Negative">Негативна</option>
+      </select>
+    </div>
+
+    <div class="ml-auto flex items-center gap-3">
+      <div class="filter-group">
+        <label>Метрика</label>
+        <div class="metric-toggle" id="metricToggle">
+          <button class="mt-btn mt-active" data-metric="count">Кількість статей</button>
+          <button class="mt-btn" data-metric="mqs">Total MQS</button>
+          <button class="mt-btn" data-metric="avg_mqs">Average MQS</button>
+        </div>
+      </div>
+      <button id="filterReset" class="text-sm text-primary hover:text-primary-2 font-medium">↺ Скинути</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tabs -->
+<nav class="bg-surface-muted border-b border-border">
+  <div class="max-w-[1400px] mx-auto px-6 flex gap-1">
+    <button class="tab-btn tab-active" data-tab="overview">Огляд</button>
+    <button class="tab-btn" data-tab="campaigns">Кампанії</button>
+    <button class="tab-btn" data-tab="narratives">Меседжі (наративи К-2)</button>
+  </div>
+</nav>
+
+<!-- Tab content -->
+<main class="max-w-[1400px] mx-auto px-6 py-8">
+
+  <!-- OVERVIEW -->
+  <section id="tab-overview" class="tab-content">
+    <div class="grid gap-4 grid-cols-2 xl:grid-cols-4" id="kpiCards"></div>
+
+    <div class="mt-8 grid gap-6 lg:grid-cols-2">
+      <div class="bg-surface rounded-xl shadow-card p-6">
+        <h3 class="text-sm font-semibold text-muted uppercase tracking-wider mb-4">Топ-5 кампаній за обсягом</h3>
+        <canvas id="overviewTopCampaigns" height="260"></canvas>
+      </div>
+      <div class="bg-surface rounded-xl shadow-card p-6">
+        <h3 class="text-sm font-semibold text-muted uppercase tracking-wider mb-4">Розподіл згадок: К-2 vs Мадяр vs Азов</h3>
+        <canvas id="overviewEntityShare" height="260"></canvas>
+      </div>
+    </div>
+
+    <div class="mt-6 bg-surface rounded-xl shadow-card p-6">
+      <h3 class="text-sm font-semibold text-muted uppercase tracking-wider mb-1">Динаміка за місяцями</h3>
+      <p class="text-xs text-muted mb-4">Натисни на точку щоб побачити статті за місяць</p>
+      <canvas id="overviewTimeline" height="80"></canvas>
+    </div>
+  </section>
+
+  <!-- CAMPAIGNS -->
+  <section id="tab-campaigns" class="tab-content hidden">
+    <div class="bg-surface rounded-xl shadow-card p-6">
+      <div class="flex items-center justify-between mb-2">
+        <div>
+          <h3 class="text-lg font-bold text-ink">27 кампаній покриття</h3>
+          <p class="text-sm text-muted">Чим вища колонка — тим більше статей. Кольори показують, яка бригада переважає. Натисни на колонку щоб побачити статті.</p>
+        </div>
+        <div class="text-sm text-muted">
+          <span id="campaignsTotal">—</span> статей
+        </div>
+      </div>
+      <canvas id="campaignsChart" height="380"></canvas>
+    </div>
+
+    <div class="mt-6 bg-surface rounded-xl shadow-card p-6">
+      <h3 class="text-sm font-semibold text-muted uppercase tracking-wider mb-4">Усі кампанії — деталі</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm" id="campaignsTable">
+          <thead class="text-muted text-xs uppercase tracking-wider">
+            <tr>
+              <th class="text-left py-3 px-3">Категорія</th>
+              <th class="text-left py-3 px-3">Кампанія</th>
+              <th class="text-right py-3 px-3">К-2</th>
+              <th class="text-right py-3 px-3">Мадяр</th>
+              <th class="text-right py-3 px-3">Азов</th>
+              <th class="text-right py-3 px-3">Усього</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- NARRATIVES -->
+  <section id="tab-narratives" class="tab-content hidden">
+    <div class="bg-primary/5 border border-primary/20 rounded-xl p-4 mb-6">
+      <p class="text-sm text-text">
+        <strong class="text-primary">Меседжі (наративи)</strong> — це думки, які читач виносить про К-2 після прочитання статті. Аналіз робиться лише на статтях, де К-2 — основна бригада (<span id="narrativesArticlesCount">—</span> статей).
+      </p>
+    </div>
+
+    <!-- 3a. Coverage -->
+    <div class="bg-surface rounded-xl shadow-card p-6 mb-6">
+      <h3 class="text-lg font-bold text-ink mb-1">Покриття 7 наративів</h3>
+      <p class="text-sm text-muted mb-4">У скількох статтях К-2 присутній кожен наратив. Натисни на колонку — побачиш статті з цитатами.</p>
+      <canvas id="narrativesChart" height="320"></canvas>
+    </div>
+
+    <!-- 3a.5 Narratives table (mirrors Campaigns table style) -->
+    <div class="bg-surface rounded-xl shadow-card p-6 mb-6">
+      <h3 class="text-sm font-semibold text-muted uppercase tracking-wider mb-4">Усі наративи — деталі</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm" id="narrativesTable">
+          <thead class="text-muted text-xs uppercase tracking-wider">
+            <tr></tr>
+          </thead>
+          <tbody class="divide-y divide-border"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 3b. Evidence -->
+    <div class="bg-surface rounded-xl shadow-card p-6 mb-6">
+      <h3 class="text-lg font-bold text-ink mb-1">Що саме говорять (цитати з медіа)</h3>
+      <p class="text-sm text-muted mb-4">Реальні фрази, на основі яких визначено наратив. Розгорни картку щоб побачити приклади.</p>
+      <div id="narrativesEvidence" class="space-y-3"></div>
+    </div>
+
+    <!-- 3c. Correlations -->
+    <div class="bg-surface rounded-xl shadow-card p-6">
+      <h3 class="text-lg font-bold text-ink mb-1">Кореляції: де наратив <em>живе</em>?</h3>
+      <p class="text-sm text-muted mb-6">Який формат / медіа-tier / тон сприяє якому меседжу. <strong class="text-text">Чим темніше — тим частіше</strong> наратив з'являється у цьому типі контенту. Натисни клітинку щоб побачити статті.</p>
+
+      <div class="space-y-8">
+        <div class="heatmap-block">
+          <h4 class="text-sm font-semibold text-text mb-1">Наратив × Тип матеріалу</h4>
+          <p class="text-xs text-muted mb-4">Очікувано: інтервʼю — людське обличчя; новини — операційні наративи.</p>
+          <div id="heatCoverage" class="heatmap"></div>
+        </div>
+        <div class="heatmap-block">
+          <h4 class="text-sm font-semibold text-text mb-1">Наратив × Tier медіа</h4>
+          <p class="text-xs text-muted mb-4">Tier 1 — топові медіа (BBC, Pravda), Tier 5 — нішеві / спеціалізовані.</p>
+          <div id="heatTier" class="heatmap"></div>
+        </div>
+        <div class="heatmap-block">
+          <h4 class="text-sm font-semibold text-text mb-1">Наратив × Тональність</h4>
+          <p class="text-xs text-muted mb-4">Який наратив частіше у нейтральному vs позитивному контексті.</p>
+          <div id="heatTone" class="heatmap"></div>
+        </div>
+        <div class="heatmap-block">
+          <h4 class="text-sm font-semibold text-text mb-1">Наратив × Місяць</h4>
+          <p class="text-xs text-muted mb-4">Як наратив розвивався у часі.</p>
+          <div class="overflow-x-auto pb-2">
+            <div id="heatMonth" class="heatmap"></div>
+          </div>
+        </div>
+        <div class="heatmap-block">
+          <h4 class="text-sm font-semibold text-text mb-1">Наратив × Наратив (співпоява)</h4>
+          <p class="text-xs text-muted mb-4">Які меседжі ходять «парою». Читається по рядку: <em>«Коли є наратив у рядку, у X% статей з ним також є наратив у колонці»</em>. Натисни клітинку — побачиш ці статті.</p>
+          <div id="heatCoocc" class="heatmap"></div>
+        </div>
+      </div>
+
+      <div class="mt-8 bg-primary/5 border border-primary/20 rounded-xl p-5">
+        <h4 class="text-sm font-bold text-primary mb-3">💡 Знайдені інсайти</h4>
+        <ul id="insightsList" class="space-y-2 text-sm text-text"></ul>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Article popup modal -->
+<div id="modal" class="fixed inset-0 bg-ink/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+  <div class="bg-surface rounded-2xl shadow-card max-w-4xl w-full max-h-[85vh] flex flex-col">
+    <div class="p-6 border-b border-border flex items-start justify-between">
+      <div>
+        <h3 id="modalTitle" class="text-lg font-bold text-ink">—</h3>
+        <p id="modalSubtitle" class="text-sm text-muted mt-1">—</p>
+      </div>
+      <button id="modalClose" class="text-muted hover:text-ink text-2xl leading-none">×</button>
+    </div>
+    <div id="modalBody" class="overflow-y-auto p-6 flex-1"></div>
+    <div class="p-4 border-t border-border flex items-center justify-between">
+      <button id="modalExport" class="text-sm text-primary font-medium hover:text-primary-2">Експортувати CSV</button>
+      <button id="modalCloseBtn" class="px-4 py-2 rounded-lg bg-surface-muted hover:bg-border text-sm font-medium">Закрити</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

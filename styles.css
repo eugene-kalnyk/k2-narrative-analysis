@@ -1,0 +1,155 @@
+/* Custom on top of Tailwind CDN */
+
+body { font-feature-settings: "ss01", "cv11"; }
+
+/* Filter group */
+.filter-group { display: flex; flex-direction: column; gap: 2px; }
+.filter-group label {
+  font-size: 10px; color: #5B6072; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.filter-select {
+  border: 1px solid #E6E7EF; background: #FFFFFF;
+  padding: 6px 28px 6px 10px; border-radius: 8px;
+  font-size: 13px; color: #1F2430; min-width: 130px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235B6072' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center;
+  cursor: pointer;
+}
+.filter-select:focus { outline: 2px solid rgba(109, 91, 255, 0.3); }
+
+/* Metric toggle */
+.metric-toggle {
+  display: inline-flex; background: #F3F2F8; border-radius: 8px; padding: 3px;
+  border: 1px solid #E6E7EF;
+}
+.mt-btn {
+  padding: 5px 12px; font-size: 12px; font-weight: 500; color: #5B6072;
+  border-radius: 6px; transition: all 0.15s; white-space: nowrap;
+}
+.mt-btn:hover { color: #1F2430; }
+.mt-active { background: #6D5BFF !important; color: #FFFFFF !important; box-shadow: 0 2px 6px rgba(109, 91, 255, 0.3); }
+
+/* Tabs */
+.tab-btn {
+  padding: 14px 20px; font-size: 14px; font-weight: 500; color: #5B6072;
+  border-bottom: 2px solid transparent; transition: all 0.15s;
+}
+.tab-btn:hover { color: #1F2430; }
+.tab-active {
+  color: #6D5BFF !important; border-bottom-color: #6D5BFF !important;
+  font-weight: 600;
+}
+
+/* KPI card */
+.kpi-card {
+  background: #FFFFFF; border-radius: 16px; padding: 22px;
+  box-shadow: 0 12px 30px rgba(20, 16, 40, 0.06);
+  border: 1px solid #E6E7EF;
+}
+.kpi-card .kpi-label {
+  font-size: 12px; color: #5B6072; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.kpi-card .kpi-value {
+  font-size: 32px; font-weight: 700; color: #0F1015;
+  font-variant-numeric: tabular-nums; line-height: 1.1; margin-top: 8px;
+}
+.kpi-card .kpi-sub {
+  font-size: 12px; color: #5B6072; margin-top: 4px;
+}
+
+/* Heatmap (CSS grid) */
+.heatmap-block { background: #FAFAFC; border: 1px solid #E6E7EF; border-radius: 12px; padding: 18px 20px; }
+.heatmap { display: grid; gap: 3px; font-size: 12px; min-width: max-content; }
+.heatmap .h-cell {
+  padding: 10px 12px; min-height: 38px; min-width: 80px; display: flex;
+  align-items: center; justify-content: center;
+  border-radius: 6px; color: #1F2430; font-weight: 600;
+  cursor: pointer; transition: transform 0.1s;
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+}
+.heatmap .h-cell:hover { transform: scale(1.06); outline: 2px solid #6D5BFF; z-index: 1; }
+.heatmap .h-cell.empty { background: #F3F2F8; color: #C0C2CC; cursor: default; font-weight: 400; }
+.heatmap .h-cell.empty:hover { transform: none; outline: none; }
+.heatmap .h-row-label, .heatmap .h-col-label {
+  padding: 8px 10px; font-size: 11px; color: #5B6072;
+  font-weight: 600; display: flex; align-items: center;
+}
+.heatmap .h-col-label { justify-content: center; text-align: center; line-height: 1.3; }
+.heatmap .h-row-label { justify-content: flex-end; text-align: right; }
+.heatmap .h-col-label .h-n { font-size: 10px; color: #9A9DAB; font-weight: 500; display: block; margin-top: 2px; }
+
+/* Article rows in modal */
+.article-row {
+  border-bottom: 1px solid #E6E7EF; padding: 14px 0;
+}
+.article-row:last-child { border-bottom: none; }
+.article-row .headline {
+  font-size: 14px; font-weight: 600; color: #1F2430; margin-bottom: 4px;
+}
+.article-row .meta-line {
+  font-size: 12px; color: #5B6072; display: flex; gap: 10px; flex-wrap: wrap;
+}
+.article-row .evidence-block {
+  margin-top: 8px; padding: 10px 14px; background: #F3F2F8;
+  border-left: 3px solid #6D5BFF; border-radius: 4px; font-size: 13px;
+  color: #1F2430; font-style: italic;
+}
+.article-row .evidence-label {
+  font-size: 10px; font-weight: 700; color: #6D5BFF; text-transform: uppercase;
+  letter-spacing: 0.05em; font-style: normal; margin-bottom: 4px;
+}
+.badge {
+  display: inline-block; padding: 2px 8px; border-radius: 999px;
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.badge.tone-positive { background: #DCFCE7; color: #166534; }
+.badge.tone-neutral { background: #E6E7EF; color: #475569; }
+.badge.tone-negative { background: #FEE2E2; color: #991B1B; }
+
+/* Evidence card (Narratives 3b) */
+.evidence-card {
+  border: 1px solid #E6E7EF; border-radius: 12px; padding: 14px 18px;
+  background: #FAFAFC;
+}
+.evidence-card summary {
+  cursor: pointer; list-style: none; display: flex; align-items: center;
+  gap: 10px; outline: none;
+}
+.evidence-card summary::-webkit-details-marker { display: none; }
+.evidence-card summary::before {
+  content: "▶"; color: #6D5BFF; font-size: 10px; transition: transform 0.2s;
+}
+.evidence-card[open] summary::before { transform: rotate(90deg); }
+.evidence-card .nid-pill {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 8px;
+  background: #6D5BFF; color: white; font-weight: 700; font-size: 13px;
+}
+.evidence-card .narrative-title {
+  font-size: 15px; font-weight: 600; color: #1F2430;
+}
+.evidence-card .narrative-count {
+  margin-left: auto; font-size: 12px; color: #5B6072;
+}
+.evidence-card .quote-list { margin-top: 14px; display: grid; gap: 10px; }
+.evidence-card .quote-item {
+  padding: 10px 14px; background: #FFFFFF; border-left: 3px solid #C8FF61;
+  border-radius: 6px; font-size: 13px;
+}
+.evidence-card .quote-item .quote-source {
+  font-size: 11px; color: #5B6072; margin-top: 4px;
+}
+
+/* Tooltip helper */
+[data-tip] { position: relative; }
+[data-tip]:hover::after {
+  content: attr(data-tip); position: absolute; bottom: 100%; left: 50%;
+  transform: translateX(-50%); background: #0F1015; color: #FFFFFF;
+  font-size: 11px; padding: 4px 8px; border-radius: 4px;
+  white-space: nowrap; z-index: 100;
+}
